@@ -35,6 +35,7 @@
 
 <script>
 import InlineProfile from './users/Inline'
+import utils from '../utils'
 
 export default {
 
@@ -44,15 +45,12 @@ export default {
     InlineProfile
   },
 
-  props: {
-    msg: String
-  },
-
   data () {
     return {
       profile: {},
       users: [],
       loading: true,
+      apiUrl: this.$store.state.apiUrl
     }
   },
 
@@ -69,45 +67,30 @@ export default {
 
   methods: {
 
-    start () {
-      this.getCookie( 'csrftoken' );
-    },
-
     getUser () {
 
-      return fetch( 'http://localhost:8000/api/user_profiles/' + this.$route.params.user_id,
-              { method: 'GET', credentials: 'include' } )
-        .then(response => response.json() )
-        .then(data => {
-          this.profile = data;
-        })
-        .catch(err => { console.log(err) })
+      return utils.get( this.apiUrl + '/api/user_profiles/' + this.$route.params.user_id )
+        .then(
+          data => {
+            this.profile = data;
+          }
+        ).catch(
+          err => { console.log(err) }
+        )
 
     },
 
     getFriends () {
 
-      return fetch( 'http://localhost:8000/api/user_profiles/?id=' + this.$route.params.user_id,
-              { method: 'GET', credentials: 'include' } )
-        .then(response => response.json() )
-        .then(data => {
-          this.users = data.results;
-        })
-        .catch(err => { console.log(err) })
+      return utils.get( this.apiUrl + '/api/user_profiles/?id=' + this.$route.params.user_id )
+        .then(
+          data => {
+            this.users = data.results;
+          }
+        ).catch(
+          err => { console.log(err) }
+        )
       
-    },
-
-    getCookie (key) {
-      var cookies = {};
-      var document_cookies = document.cookie.split("; ");
-      for (var i = 0; i <= document_cookies.length; i++) {
-        var ckey = document_cookies[i].split('=')[0];
-        var cval = document_cookies[i].split('=')[1];
-        if (ckey === key) {
-          return cval
-        }
-      }
-      return null;
     }
 
   }

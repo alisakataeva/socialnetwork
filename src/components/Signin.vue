@@ -44,6 +44,7 @@
 <script>
 import Input from './modules/form/Input'
 import Button from './modules/form/Button'
+import utils from '../utils'
 
 export default {
 
@@ -57,37 +58,28 @@ export default {
   data () {
     return {
       loading: false,
-      userData: {}
+      userData: {},
+      apiUrl: this.$store.state.apiUrl
     }
   },
 
   methods: {
 
     login (e) {
+      
+      var csrf = utils.getCookie( 'csrftoken' );
       var formData = new FormData( e.target );
-      fetch(
-        'http://localhost:8000/login/?username=' + formData.get("username") + '&password=' + formData.get("password"),
-        { method: 'GET', credentials: 'include' }
-      ).then(
-        response => response.json()
-      ).then(
-        data => {
-          console.log(data)
-          if (data.hasOwnProperty('user')) {
-            this.$store.commit(
-              'setProfile',
-              data.user
-            )
-          };
-          this.$router.push({
-            name: 'profile',
-            params: {
-              'user_id': data.user.id
-            }
-          })
-          console.log( data );
-        }
-      )
+
+      utils.post( this.apiUrl + '/login/', csrf, formData )
+        .then(
+          data => {
+            if (data.hasOwnProperty('user')) {
+              this.$store.commit( 'setProfile', data.user )
+              this.$router.push({ name: 'profile', params: { 'user_id': data.user.id } })
+            };
+          }
+        )
+
     }
 
   }

@@ -25,6 +25,8 @@
 
 <script>
 import Post from './modules/Post';
+import utils from '../utils'
+
 export default {
   
   name: 'MyBlog',
@@ -37,7 +39,8 @@ export default {
     return {
       loading: true,
       profile: {},
-      posts: []
+      posts: [],
+      apiUrl: this.$store.state.apiUrl
     }
   },
 
@@ -55,29 +58,29 @@ export default {
   methods: {
 
     getUser () {
-      return fetch (
-        'http://localhost:8000/api/user_profiles/' + this.$route.params.user_id,
-        { method: 'GET', credentials: 'include' }
-      ).then(
-        response => response.json()
-      ).then(
-        data => {
-          this.profile = data;
-        }
-      ).catch(err => { console.log(err) })
+
+      return utils.get( this.apiUrl + '/api/user_profiles/' + this.$route.params.user_id )
+        .then(
+          data => {
+            this.profile = data;
+          }
+        ).catch(
+          err => { console.log(err) }
+        )
+
     },
 
     getPosts () {
-      return fetch (
-        'http://localhost:8000/api/posts/?id=' + this.$route.params.user_id,
-        { method: 'GET', credentials: 'include' }
-      ).then(
-        response => response.json()
-      ).then(
-        data => {
-          this.posts = data.results;
-        }
-      )
+
+      return utils.get( this.apiUrl + '/api/posts/?id=' + this.$route.params.user_id )
+        .then(
+          data => {
+            this.posts = data.results;
+          }
+        ).catch(
+          err => { console.log(err) }
+        )
+
     }
 
   }

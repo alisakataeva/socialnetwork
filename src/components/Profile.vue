@@ -54,6 +54,7 @@
 <script>
 import Input from './modules/form/Input'
 import Button from './modules/form/Button'
+import utils from '../utils'
 
 export default {
   
@@ -68,7 +69,8 @@ export default {
     return {
       loading: true,
       editing: false,
-      profile: {}
+      profile: {},
+      apiUrl: this.$store.state.apiUrl
     }
   },
 
@@ -88,29 +90,15 @@ export default {
 
     fetchData () {
 
-      fetch (
-        'http://localhost:8000/api/user_profiles/' + this.$route.params.user_id,
-        { method: 'GET', credentials: 'include' }
-      ).then(
-        response => response.json()
-      ).then(
-        data => {
-          this.profile = data;
-          this.loading = false;
-        }
-      )
+      utils.get( this.apiUrl + '/api/user_profiles/' + this.$route.params.user_id )
+        .then(
+          data => {
+            this.profile = data;
+            this.loading = false;
+          }
+        )
 
-    },
-
-    startEditing () {
-      this.editing = true;
-      console.log('start editing');
-    },
-
-    endEditing () {
-      this.editing = false;
-      console.log('end editing');
-    },
+    }
 
   }
 

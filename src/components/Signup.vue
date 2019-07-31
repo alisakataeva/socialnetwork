@@ -102,40 +102,28 @@ export default {
   data () {
     return {
       loading: false,
-      userData: {}
+      userData: {},
+      apiUrl: this.$store.state.apiUrl
     }
   },
 
   methods: {
 
     register (e) {
+      
       var csrf = utils.getCookie( 'csrftoken' );
       var formData = new FormData( e.target );
-      fetch(
-        'http://localhost:8000/register/',
-        { method: 'POST', credentials: 'include',
-          headers: {
-            'X-CSRFToken': csrf
-          },
-          body: formData }
-      ).then(
-        response => response.json()
-      ).then(
-        data => {
-          if (data.hasOwnProperty('user')) {
-            this.$store.commit(
-              'setProfile',
-              data.user
-            )
-            this.$router.push({
-              name: 'profile',
-              params: {
-                'user_id': data.user.id
-              }
-            })
-          };
-        }
-      )
+
+      utils.post( this.apiUrl + '/register/', csrf, formData )
+        .then(
+          data => {
+            if (data.hasOwnProperty('user')) {
+              this.$store.commit( 'setProfile', data.user )
+              this.$router.push({ name: 'profile', params: { 'user_id': data.user.id } })
+            };
+          }
+        )
+
     }
 
   }

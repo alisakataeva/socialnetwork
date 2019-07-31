@@ -4,9 +4,7 @@
     <h6>Users</h6>
 
     <div v-if="loading">
-
-      loading...
-
+      Loading...
     </div>
 
     <div v-else>
@@ -33,6 +31,7 @@
 
 <script>
 import InlineProfile from './users/Inline'
+import utils from '../utils'
 
 export default {
 
@@ -50,12 +49,14 @@ export default {
     return {
       profile: {},
       users: [],
+      friends: [],
       loading: true,
+      apiUrl: this.$store.state.apiUrl
     }
   },
 
   created () {
-    this.getFriends()
+    this.getUsers()
   },
 
   methods: {
@@ -64,34 +65,18 @@ export default {
       this.getCookie( 'csrftoken' );
     },
 
-    getFriends () {
+    getUsers () {
 
-      return fetch(
-        'http://localhost:8000/api/user_profiles/',
-        { method: 'GET', credentials: 'include' }
-      ).then(
-        response => response.json()
-      ).then(
-        data => {
-          this.users = data.results;
-          this.loading = false;
-        }
-      )
-      .catch(err => { console.log(err) })
+      utils.get( this.apiUrl + '/api/user_profiles/' )
+        .then(
+          data => {
+            this.users = data.results;
+            this.loading = false;
+          }
+        ).catch(
+          err => { console.log(err) }
+        )
       
-    },
-
-    getCookie (key) {
-      var cookies = {};
-      var document_cookies = document.cookie.split("; ");
-      for (var i = 0; i <= document_cookies.length; i++) {
-        var ckey = document_cookies[i].split('=')[0];
-        var cval = document_cookies[i].split('=')[1];
-        if (ckey === key) {
-          return cval
-        }
-      }
-      return null;
     }
 
   }

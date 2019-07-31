@@ -1,14 +1,16 @@
 <template>
   <div>
 
-    <router-link :to="{'name': 'profile', params:{'user_id':id}}" class="profile">
-      <div class="profile-thumbnail">
-        <div class="profile-thumbnail-inner" :style="{'background-image': 'url(' + thumbnail + ')'}"></div>
-      </div>
-      <div class="profile-header">
-        <div class="profile-fullname"> {{ lastname }} {{ firstname }} </div>
-        <div class="profile-username"> @{{ username }} </div>
-      </div>
+    <!-- {{ data }} -->
+
+    <router-link class="profile" :to="{'name': 'profile', params:{'user_id':id}}">
+        <div class="profile-thumbnail">
+          <div class="profile-thumbnail-inner" :style="{'background-image': 'url(' + thumbnail + ')'}"></div>
+        </div>
+        <div>
+          <div class="profile-fullname"> {{ lastname }} {{ firstname }} </div>
+          <div class="profile-username"> @{{ username }} </div>
+        </div>
     </router-link>
 
   </div>
@@ -35,6 +37,10 @@ export default {
   .profile {
     padding: 4px;
     display: flex;
+    text-decoration: none;
+    color: inherit;
+  }
+  .profile {
     text-decoration: none;
     color: inherit;
   }

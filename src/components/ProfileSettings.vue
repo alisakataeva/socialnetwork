@@ -105,7 +105,8 @@ export default {
   data () {
     return {
       loading: true,
-      profile: {}
+      profile: {},
+      apiUrl: this.$store.state.apiUrl
     }
   },
 
@@ -121,54 +122,40 @@ export default {
 
     fetchData () {
 
-      fetch (
-        'http://localhost:8000/api/user_profiles/' + this.$route.params.user_id,
-        { method: 'GET', credentials: 'include' }
-      ).then(
-        response => response.json()
-      ).then(
-        data => {
-          this.profile = data;
-          this.loading = false;
-        }
-      )
+      utils.get( this.apiUrl + '/api/user_profiles/' + this.$route.params.user_id )
+        .then(
+          data => {
+            this.profile = data;
+            this.loading = false;
+          }
+        )
 
     },
     
     saveData () {
-      var csrf = utils.getCookie( 'csrftoken' );
-      Promise.all([
-        fetch(
-          'http://localhost:8000/api/user_profiles/' + this.profile.id + '/',
-          { method: 'PATCH', credentials: 'include', 
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-              'X-CSRFToken': csrf
-            },
-            body: JSON.stringify({
-              biography: this.profile.biography,
-              i_like: this.profile.i_like,
-              i_dislike: this.profile.i_dislike
-            }) }
-        ),
-        fetch(
-          'http://localhost:8000/api/users/' + this.profile.user.id + '/',
-          { method: 'PATCH', credentials: 'include', 
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-              'X-CSRFToken': csrf
-            },
-            body: JSON.stringify({
-              username: this.profile.user.username,
-              first_name: this.profile.user.first_name,
-              last_name: this.profile.user.last_name,
-              email: this.profile.user.email,
-            }) }
-        ),
 
+      var csrf = utils.getCookie( 'csrftoken' );
+
+      var profile_url = this.apiUrl + '/api/user_profiles/' + this.profile.id + '/';
+      var profile_data = JSON.stringify({
+        biography: this.profile.biography,
+        i_like: this.profile.i_like,
+        i_dislike: this.profile.i_dislike
+      });
+
+      var user_url = this.apiUrl + '/api/users/' + this.profile.user.id + '/';
+      var user_data = JSON.stringify({
+        username: this.profile.user.username,
+        first_name: this.profile.user.first_name,
+        last_name: this.profile.user.last_name,
+        email: this.profile.user.email,
+      });
+
+      Promise.all([
+        utils.patch_json( profile_url, csrf, profile_data ),
+        utils.patch_json( user_url, csrf, user_data )
       ])
+
     }
 
   }
